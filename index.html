@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calcolatori Terapia Multipla – Ossigeno Liquido</title>
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#eef2f7;
+  padding:30px;
+  color:#0f2347;
+}
+
+.wrap{
+  max-width:900px;
+  margin:auto;
+}
+
+h1{
+  text-align:center;
+  font-size:32px;
+  margin-bottom:10px;
+}
+
+.sub{
+  text-align:center;
+  color:#6d7b95;
+  margin-bottom:30px;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.08);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.tile{
+  background:#e6f7f3;
+  border:1px solid #cdeee7;
+  padding:20px;
+  border-radius:16px;
+  cursor:pointer;
+  font-weight:600;
+  transition:.2s;
+}
+
+.tile:hover{
+  transform:translateY(-2px);
+}
+
+.note{
+  margin-top:20px;
+  font-size:14px;
+  color:#5c6e8f;
+}
+
+@media (max-width:700px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<h1>Calcolatori Terapia Multipla – O₂ Liquido</h1>
+<div class="sub">Seleziona il tipo di contenitore</div>
+
+<div class="card">
+
+<div class="grid">
+
+<div class="tile"
+onclick="window.open('led-8/index.html','_self')">
+Calcolatore Terapia Multipla – LED (8 LED)
+</div>
+
+<div class="tile"
+onclick="window.open('led-10/index.html','_self')">
+Calcolatore Terapia Multipla – LED (10 LED)
+</div>
+
+<div class="tile"
+onclick="window.open('ago/index.html','_self')">
+Calcolatore Terapia Multipla – Ago (10 tacche)
+</div>
+
+<div class="tile"
+onclick="window.open('stantuffo/index.html','_self')">
+Calcolatore Terapia Multipla – Stantuffo
+</div>
+
+</div>
+
+<div class="note">
+I calcolatori si aprono nella stessa schermata per continuità operativa.
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
