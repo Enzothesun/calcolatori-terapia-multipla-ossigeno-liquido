@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calcolatore Autonomia – Terapia Multipla LED 10</title>
+  <style>
+    :root {
+      --bg: #eef2f7;
+      --panel: #f7f8fa;
+      --card: #f3f5f8;
+      --border: #d8dee8;
+      --text: #0f2347;
+      --muted: #6d7b95;
+      --accent: #2f6fec;
+      --danger: #c64545;
+      --danger-bg: #fdecec;
+      --shadow: 0 8px 24px rgba(15, 35, 71, 0.08);
+      --radius: 18px;
+      --led-red: #efb3b3;
+      --led-yellow: #ead273;
+      --led-green: #a8e0b8;
+      --led-outline: #2f6fec;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 28px;
+    }
+
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 14px 0 6px;
+      text-align: center;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 24px;
+      font-size: 18px;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(216, 222, 232, 0.9);
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+      padding: 18px;
+      backdrop-filter: blur(6px);
+    }
+
+    .top-grid {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .field-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .label {
+      display: block;
+      font-weight: 800;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .led-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: nowrap;
+      margin-bottom: 10px;
+    }
+
+    .led-block {
+      width: 26px;
+      height: 14px;
+      border-radius: 999px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+    }
+
+    .led-block:hover {
+      transform: translateY(-1px);
+    }
+
+    .led-block.active {
+      border-color: var(--led-outline);
+      box-shadow: 0 0 0 3px rgba(47, 111, 236, 0.14);
+    }
+
+    .led-red { background: var(--led-red); }
+    .led-yellow { background: var(--led-yellow); }
+    .led-green { background: var(--led-green); }
+
+    .led-numbers {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      padding: 0 2px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #edf2fb;
+      border: 1px solid #d7e2fa;
+      color: #294d92;
+      font-size: 14px;
+      font-weight: 700;
+      margin: 4px 8px 8px 0;
+    }
+
+    .therapy-table {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 12px 14px;
+      align-items: end;
+    }
+
+    .therapy-header {
+      grid-column: 1 / -1;
+      font-weight: 800;
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+
+    .mini-label {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block;
+      font-weight: 700;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: white;
+      font-size: 22px;
+      color: var(--text);
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(47,111,236,0.12);
+    }
+
+    .alert {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert.danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #f4c3c3;
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .result-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 18px;
+      text-align: center;
+      min-height: 132px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .result-title {
+      color: #5c6e8f;
+      font-weight: 800;
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 10px;
+    }
+
+    .result-value {
+      font-size: clamp(28px, 4vw, 46px);
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .unit-inline {
+      font-size: 24px;
+      font-weight: 500;
+      color: #60708f;
+      margin-left: 4px;
+    }
+
+    .hours-info {
+      margin-top: 12px;
+      text-align: left;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: #4f5f7e;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .copyright {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      body { padding: 16px; }
+      .top-grid, .results { grid-template-columns: 1fr; }
+      .therapy-table { grid-template-columns: 1fr 1fr; }
+      input[type="number"] { font-size: 20px; }
+    }
+
+    @media (max-width: 560px) {
+      .therapy-table { grid-template-columns: 1fr; }
+      .led-block { width: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Calcolatore Autonomia – Terapia Multipla LED 10</h1>
+    <div class="subtitle">stima prudenziale: si considera sempre − 1 LED</div>
+
+    <div class="panel">
+      <div class="top-grid">
+        <div class="field-card">
+          <label class="label">LED acceso (osservato) [1–10]</label>
+
+          <div class="led-row" id="ledRow">
+            <div class="led-block led-red" data-led="1" title="1"></div>
+            <div class="led-block led-red" data-led="2" title="2"></div>
+            <div class="led-block led-yellow" data-led="3" title="3"></div>
+            <div class="led-block led-yellow" data-led="4" title="4"></div>
+            <div class="led-block led-green" data-led="5" title="5"></div>
+            <div class="led-block led-green" data-led="6" title="6"></div>
+            <div class="led-block led-green" data-led="7" title="7"></div>
+            <div class="led-block led-green" data-led="8" title="8"></div>
+            <div class="led-block led-green" data-led="9" title="9"></div>
+            <div class="led-block led-green" data-led="10" title="10"></div>
+          </div>
+
+          <div class="led-numbers">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+            <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+          </div>
+
+          <div class="pill">LED osservato: <span id="ledObserved">8</span></div>
+          <div class="pill">LED per calcolo: <span id="ledForCalc">7</span></div>
+        </div>
+
+        <div class="field-card">
+          <div class="therapy-table">
+            <div class="therapy-header">Terapia giornaliera</div>
+
+            <div>
+              <label class="mini-label" for="flow1">Flusso 1 (L/min)</label>
+              <input id="flow1" type="number" min="0" step="0.1" value="2">
+            </div>
+            <div>
+              <label class="mini-label" for="hours1">Ore 1</label>
+              <input id="hours1" type="number" min="0" step="0.1" value="10">
+            </div>
+
+            <div>
+              <label class="mini-label" for="flow2">Flusso 2 (L/min)</label>
+              <input id="flow2" type="number" min="0" step="0.1" value="3">
+            </div>
+            <div>
+              <label class="mini-label" for="hours2">Ore 2</label>
+              <input id="hours2" type="number" min="0" step="0.1" value="10">
+            </div>
+
+            <div>
+              <label class="mini-label" for="flow3">Flusso 3 (L/min)</label>
+              <input id="flow3" type="number" min="0" step="0.1" value="4">
+            </div>
+            <div>
+              <label class="mini-label" for="hours3">Ore 3</label>
+              <input id="hours3" type="number" min="0" step="0.1" value="4">
+            </div>
+
+            <div>
+              <label class="mini-label" for="flow4">Flusso 4 (L/min)</label>
+              <input id="flow4" type="number" min="0" step="0.1" value="0">
+            </div>
+            <div>
+              <label class="mini-label" for="hours4">Ore 4</label>
+              <input id="hours4" type="number" min="0" step="0.1" value="0">
+            </div>
+          </div>
+
+          <div id="hoursAlert" class="alert danger">
+            Attenzione: la somma delle ore terapia supera 24 ore. Verificare i dati inseriti.
+          </div>
+
+          <div class="hours-info">
+            Totale ore terapia inserite: <span id="totalHoursText">24</span> h
+          </div>
+        </div>
+      </div>
+
+      <div class="results">
+        <div class="result-card">
+          <div class="result-title">Litri residui (stima prudenziale)</div>
+          <div class="result-value">
+            <span id="litersResidual">18.550</span>
+            <span class="unit-inline">L</span>
+          </div>
+        </div>
+
+        <div class="result-card">
+          <div class="result-title">Autonomia (ore)</div>
+          <div class="result-value" id="autonomyHours">112</div>
+        </div>
+
+        <div class="result-card">
+          <div class="result-title">Autonomia (giorni)</div>
+          <div class="result-value" id="autonomyDays">4,7</div>
+        </div>
+
+        <div class="result-card">
+          <div class="result-title">Consumo/giorno (L)</div>
+          <div class="result-value">
+            <span id="dailyConsumption">3.960</span>
+            <span class="unit-inline">L</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        <strong>Ogni LED ≈ 2.650 L</strong> (capacità 26.500 L totali su scala 10 LED).<br>
+        <strong>Colori indicativi (osservati):</strong> 1-2 = rosso · 3-4 = giallo · 5-10 = verde.<br>
+        La stima è prudenziale: si considera sempre un LED in meno rispetto a quello osservato.
+      </div>
+
+      <div class="copyright">© Calcolatore autonomia – uso informativo</div>
+    </div>
+  </div>
+
+  <script>
+    const LITERS_PER_LED = 2650;
+    const ledBlocks = document.querySelectorAll('.led-block');
+    const ledObservedEl = document.getElementById('ledObserved');
+    const ledForCalcEl = document.getElementById('ledForCalc');
+    const litersResidualEl = document.getElementById('litersResidual');
+    const autonomyHoursEl = document.getElementById('autonomyHours');
+    const autonomyDaysEl = document.getElementById('autonomyDays');
+    const dailyConsumptionEl = document.getElementById('dailyConsumption');
+    const totalHoursTextEl = document.getElementById('totalHoursText');
+    const hoursAlertEl = document.getElementById('hoursAlert');
+
+    const inputs = [
+      { flow: document.getElementById('flow1'), hours: document.getElementById('hours1') },
+      { flow: document.getElementById('flow2'), hours: document.getElementById('hours2') },
+      { flow: document.getElementById('flow3'), hours: document.getElementById('hours3') },
+      { flow: document.getElementById('flow4'), hours: document.getElementById('hours4') }
+    ];
+
+    let observedLed = 8;
+
+    function parseValue(value) {
+      const parsed = parseFloat(String(value).replace(',', '.'));
+      return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+    }
+
+    function formatInteger(value) {
+      return Math.round(value).toLocaleString('it-IT');
+    }
+
+    function formatOneDecimal(value) {
+      return value.toLocaleString('it-IT', {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+      });
+    }
+
+    function setActiveLed() {
+      ledBlocks.forEach(block => {
+        const led = Number(block.dataset.led);
+        block.classList.toggle('active', led === observedLed);
+      });
+    }
+
+    function calculate() {
+      const ledForCalc = Math.max(observedLed - 1, 0);
+      const litersResidual = ledForCalc * LITERS_PER_LED;
+
+      let totalHours = 0;
+      let dailyConsumption = 0;
+
+      inputs.forEach(row => {
+        const flow = parseValue(row.flow.value);
+        const hours = parseValue(row.hours.value);
+
+        totalHours += hours;
+        dailyConsumption += flow * 60 * hours;
+      });
+
+      let autonomyDays = 0;
+      let autonomyHours = 0;
+
+      if (dailyConsumption > 0) {
+        autonomyDays = litersResidual / dailyConsumption;
+        autonomyHours = autonomyDays * 24;
+      }
+
+      ledObservedEl.textContent = observedLed;
+      ledForCalcEl.textContent = ledForCalc;
+      litersResidualEl.textContent = formatInteger(litersResidual);
+      dailyConsumptionEl.textContent = formatInteger(dailyConsumption);
+      autonomyDaysEl.textContent = dailyConsumption > 0 ? formatOneDecimal(autonomyDays) : '0,0';
+      autonomyHoursEl.textContent = dailyConsumption > 0 ? formatInteger(autonomyHours) : '0';
+      totalHoursTextEl.textContent = formatOneDecimal(totalHours).replace(',0', '');
+
+      if (totalHours > 24) {
+        hoursAlertEl.classList.add('show');
+      } else {
+        hoursAlertEl.classList.remove('show');
+      }
+    }
+
+    ledBlocks.forEach(block => {
+      block.addEventListener('click', () => {
+        observedLed = Number(block.dataset.led);
+        setActiveLed();
+        calculate();
+      });
+    });
+
+    inputs.forEach(row => {
+      row.flow.addEventListener('input', calculate);
+      row.hours.addEventListener('input', calculate);
+    });
+
+    setActiveLed();
+    calculate();
+  </script>
+</body>
+</html>
