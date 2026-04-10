@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calcolatore Autonomia – Stantuffo (Terapia multipla)</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --muted:#64748b;
+      --text:#0f172a;
+      --line:#e5e7eb;
+      --accent:#2563eb;
+      --ok:#16a34a;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif
+    }
+
+    body{
+      margin:0;
+      background:radial-gradient(1200px 800px at 20% -10%, #eef2ff 0,transparent 60%), var(--bg);
+      color:var(--text)
+    }
+
+    .wrap{
+      max-width:980px;
+      margin:32px auto;
+      padding:0 16px
+    }
+
+    .title{
+      margin:0 0 16px;
+      font-weight:800;
+      letter-spacing:.2px
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:0 8px 24px rgba(15,23,42,.06);
+      padding:20px
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px
+    }
+
+    @media (max-width:900px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .panel{
+      padding:16px;
+      border:1px solid var(--line);
+      border-radius:14px
+    }
+
+    .panel h3{
+      margin:0 0 12px;
+      font-size:14px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.06em
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap
+    }
+
+    .stack{
+      display:flex;
+      flex-direction:column;
+      gap:12px
+    }
+
+    .therapy-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px
+    }
+
+    @media (max-width:640px){
+      .therapy-grid{grid-template-columns:1fr}
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px
+    }
+
+    label{
+      font-size:14px;
+      color:var(--muted)
+    }
+
+    select,input[type="text"],input[type="number"]{
+      height:42px;
+      padding:0 12px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      outline:none;
+      font-size:16px;
+      min-width:120px;
+      background:#fff
+    }
+
+    .btn{
+      height:42px;
+      padding:0 12px;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:10px;
+      cursor:pointer
+    }
+
+    .btn:active{
+      transform:translateY(1px)
+    }
+
+    .kpis{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px
+    }
+
+    @media (max-width:900px){
+      .kpis{grid-template-columns:repeat(2,1fr)}
+    }
+
+    .kpi{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px
+    }
+
+    .kpi .k{
+      font-size:12px;
+      letter-spacing:.08em;
+      color:var(--muted);
+      text-transform:uppercase
+    }
+
+    .kpi .v{
+      font-size:24px;
+      font-weight:800;
+      margin-top:6px
+    }
+
+    .note{
+      margin-top:12px;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fafafa
+    }
+
+    .note.warn{
+      background:#fff7ed;
+      border-color:#fed7aa;
+      color:#9a3412
+    }
+
+    .note.danger{
+      background:#fef2f2;
+      border-color:#fecaca;
+      color:#991b1b
+    }
+
+    .gaugeCard{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px
+    }
+
+    .gaugeWrap{
+      position:relative;
+      width:280px;
+      height:280px
+    }
+
+    .foot{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px
+    }
+
+    .summary{
+      font-size:14px;
+      color:var(--text);
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fafafa
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <h1 class="title">Calcolatore Autonomia – Contenitore a Stantuffo (Terapia multipla)</h1>
+
+    <div class="card">
+      <div class="grid">
+        <div class="panel">
+          <h3>Indicatore a stantuffo</h3>
+          <div class="gaugeCard">
+            <div class="gaugeWrap">
+              <svg id="gauge" viewBox="0 0 240 240" width="100%" height="100%" aria-label="Quadrante livello">
+                <circle cx="120" cy="120" r="96" fill="#fff" stroke="#e5e7eb" stroke-width="2"/>
+                <defs>
+                  <linearGradient id="gradV" x1="0" y1="1" x2="0" y2="0">
+                    <stop offset="0%" stop-color="#ef4444"/>
+                    <stop offset="25%" stop-color="#f59e0b"/>
+                    <stop offset="40%" stop-color="#f59e0b"/>
+                    <stop offset="100%" stop-color="#16a34a"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="120" cy="120" r="80" fill="none" stroke="url(#gradV)" stroke-width="10" />
+                <g id="ticks" stroke="#cbd5e1" stroke-width="2"></g>
+                <g id="labels" font-size="12" fill="#64748b" text-anchor="middle" dominant-baseline="middle"></g>
+                <rect id="marker" x="80" y="120" width="80" height="6" rx="3" fill="#2563eb" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Impostazioni</h3>
+
+          <div class="stack">
+            <div class="row">
+              <label for="livello">Livello:</label>
+              <select id="livello">
+                <option value="1/1">1/1 – pieno</option>
+                <option value="3/4">3/4 – alto</option>
+                <option value="1/2">1/2 – metà</option>
+                <option value="1/4">1/4 – basso</option>
+                <option value="0">0 – (da considerarsi finito)</option>
+              </select>
+            </div>
+
+            <div class="therapy-grid">
+              <div class="field">
+                <label for="flusso1">Flusso 1 (L/min)</label>
+                <input id="flusso1" type="text" inputmode="decimal" value="2" />
+              </div>
+              <div class="field">
+                <label for="ore1">Ore 1</label>
+                <input id="ore1" type="number" min="0" max="24" step="0.1" value="10" />
+              </div>
+
+              <div class="field">
+                <label for="flusso2">Flusso 2 (L/min)</label>
+                <input id="flusso2" type="text" inputmode="decimal" value="3" />
+              </div>
+              <div class="field">
+                <label for="ore2">Ore 2</label>
+                <input id="ore2" type="number" min="0" max="24" step="0.1" value="10" />
+              </div>
+
+              <div class="field">
+                <label for="flusso3">Flusso 3 (L/min)</label>
+                <input id="flusso3" type="text" inputmode="decimal" value="4" />
+              </div>
+              <div class="field">
+                <label for="ore3">Ore 3</label>
+                <input id="ore3" type="number" min="0" max="24" step="0.1" value="4" />
+              </div>
+
+              <div class="field">
+                <label for="flusso4">Flusso 4 (L/min)</label>
+                <input id="flusso4" type="text" inputmode="decimal" value="0" />
+              </div>
+              <div class="field">
+                <label for="ore4">Ore 4</label>
+                <input id="ore4" type="number" min="0" max="24" step="0.1" value="0" />
+              </div>
+            </div>
+
+            <div class="summary">
+              Totale ore terapia: <strong id="totOre">—</strong>
+            </div>
+          </div>
+
+          <div class="kpis" style="margin-top:12px">
+            <div class="kpi"><div class="k">Litri residui</div><div class="v" id="kLitri">—</div></div>
+            <div class="kpi"><div class="k">Autonomia (ore)</div><div class="v" id="kOre">—</div></div>
+            <div class="kpi"><div class="k">Autonomia (giorni)</div><div class="v" id="kGiorni">—</div></div>
+            <div class="kpi"><div class="k">Consumo/giorno</div><div class="v" id="kConsumo">—</div></div>
+          </div>
+
+          <div id="avvisoOre" class="note danger" style="display:none;margin-top:14px">
+            ⚠️ La somma delle ore terapia supera <strong>24 ore</strong>. Verificare i dati inseriti.
+          </div>
+
+          <div id="avvisoLivello" class="note warn" style="display:none;margin-top:14px">
+            ⚠️ Anche se l’indicatore è su <strong>0</strong> restano circa <strong>3.000 L</strong>, ma il contenitore va considerato <strong>finito</strong> e sostituito.
+          </div>
+
+          <div class="foot">
+            Valori impostati: 1/1 → 26.500 L · 3/4 → 19.875 L · 1/2 → 13.250 L · 1/4 → 6.625 L · 0 → 3.000 L.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const mapLitri = {
+    "1/1": 26500,
+    "3/4": 19875,
+    "1/2": 13250,
+    "1/4": 6625,
+    "0": 3000
+  };
+
+  const mapFrac = {
+    "0": 0,
+    "1/4": 0.25,
+    "1/2": 0.5,
+    "3/4": 0.75,
+    "1/1": 1
+  };
+
+  const sel = document.getElementById('livello');
+
+  const flusso1 = document.getElementById('flusso1');
+  const flusso2 = document.getElementById('flusso2');
+  const flusso3 = document.getElementById('flusso3');
+  const flusso4 = document.getElementById('flusso4');
+
+  const ore1 = document.getElementById('ore1');
+  const ore2 = document.getElementById('ore2');
+  const ore3 = document.getElementById('ore3');
+  const ore4 = document.getElementById('ore4');
+
+  const kLitri = document.getElementById('kLitri');
+  const kOre = document.getElementById('kOre');
+  const kGiorni = document.getElementById('kGiorni');
+  const kConsumo = document.getElementById('kConsumo');
+  const totOre = document.getElementById('totOre');
+
+  const avvisoOre = document.getElementById('avvisoOre');
+  const avvisoLivello = document.getElementById('avvisoLivello');
+
+  const ticksG = document.getElementById('ticks');
+  const labelsG = document.getElementById('labels');
+  const marker = document.getElementById('marker');
+
+  const steps = ["0","1/4","1/2","3/4","1/1"];
+  const cx = 120, cy = 120, span = 75;
+
+  steps.forEach(s => {
+    const f = mapFrac[s];
+    const y = cy + (1 - 2*f) * span;
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', String(cx-50));
+    line.setAttribute('x2', String(cx+50));
+    line.setAttribute('y1', String(y));
+    line.setAttribute('y2', String(y));
+    ticksG.appendChild(line);
+
+    const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('x', String(cx));
+    label.setAttribute('y', String(y-12));
+    label.textContent = s;
+    labelsG.appendChild(label);
+  });
+
+  function parseNum(v){
+    const s = String(v).replace(',', '.').trim();
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function fmtInt(n){
+    return n.toLocaleString('it-IT', { maximumFractionDigits: 0 });
+  }
+
+  function fmt1(n){
+    return n.toLocaleString('it-IT', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }
+
+  function update(){
+    const livello = sel.value;
+    const litri = mapLitri[livello] || 0;
+
+    const f1 = Math.max(0, parseNum(flusso1.value));
+    const f2 = Math.max(0, parseNum(flusso2.value));
+    const f3 = Math.max(0, parseNum(flusso3.value));
+    const f4 = Math.max(0, parseNum(flusso4.value));
+
+    const h1 = Math.max(0, parseNum(ore1.value));
+    const h2 = Math.max(0, parseNum(ore2.value));
+    const h3 = Math.max(0, parseNum(ore3.value));
+    const h4 = Math.max(0, parseNum(ore4.value));
+
+    const totaleOre = h1 + h2 + h3 + h4;
+
+    const consumoGiorno =
+      (f1 * 60 * h1) +
+      (f2 * 60 * h2) +
+      (f3 * 60 * h3) +
+      (f4 * 60 * h4);
+
+    const autonomiaGiorni = consumoGiorno > 0 ? litri / consumoGiorno : 0;
+    const autonomiaOre = autonomiaGiorni * 24;
+
+    kLitri.textContent = fmtInt(Math.round(litri)) + ' L';
+    kOre.textContent = fmt1(autonomiaOre);
+    kGiorni.textContent = fmt1(autonomiaGiorni);
+    kConsumo.textContent = fmtInt(Math.round(consumoGiorno)) + ' L';
+    totOre.textContent = fmt1(totaleOre).replace(',0','') + ' h';
+
+    avvisoLivello.style.display = (livello === '0') ? 'block' : 'none';
+    avvisoOre.style.display = (totaleOre > 24) ? 'block' : 'none';
+
+    const f = mapFrac[livello] || 0;
+    const y = cy + (1 - 2*f) * span - 3;
+    marker.setAttribute('y', String(y));
+  }
+
+  sel.addEventListener('change', update);
+  flusso1.addEventListener('input', update);
+  flusso2.addEventListener('input', update);
+  flusso3.addEventListener('input', update);
+  flusso4.addEventListener('input', update);
+  ore1.addEventListener('input', update);
+  ore2.addEventListener('input', update);
+  ore3.addEventListener('input', update);
+  ore4.addEventListener('input', update);
+
+  update();
+})();
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const textsToHide = new Set(['1/4','3/4','¼','¾']);
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT, null, false);
+  let node;
+  while ((node = walker.nextNode())) {
+    try {
+      const t = (node.innerText || node.textContent || '').trim();
+      if (textsToHide.has(t)) {
+        node.style.visibility = 'hidden';
+      }
+    } catch(e){}
+  }
+});
+</script>
+
+</body>
+</html>
