@@ -1,491 +1,451 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calcolatore Autonomia – Terapia Multipla Ago</title>
-  <style>
-    :root {
-      --bg: #eef2f7;
-      --panel: #f7f8fa;
-      --card: #f3f5f8;
-      --border: #d8dee8;
-      --text: #0f2347;
-      --muted: #6d7b95;
-      --accent: #2f6fec;
-      --danger: #c64545;
-      --danger-bg: #fdecec;
-      --shadow: 0 8px 24px rgba(15, 35, 71, 0.08);
-      --radius: 18px;
-      --tick-red: #efb3b3;
-      --tick-yellow: #ead273;
-      --tick-green: #a8e0b8;
-      --tick-outline: #2f6fec;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calcolatore Autonomia (ago, 10 tacche) – Terapia multipla</title>
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --card:#fff;
+    --border:#e5e7eb;
+    --text:#0f172a;
+    --muted:#64748b;
+    --pill:#f8fafc;
+    --green:#22c55e;
+    --yellow:#f59e0b;
+    --red:#ef4444;
+  }
 
-    * { box-sizing: border-box; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial
+  }
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding: 28px;
-    }
+  .wrap{
+    max-width:1100px;
+    margin:24px auto 48px;
+    padding:0 18px
+  }
 
-    .wrap {
-      max-width: 1080px;
-      margin: 0 auto;
-    }
+  h1{
+    margin:0 0 10px;
+    font-size:26px;
+    font-weight:800
+  }
 
-    h1 {
-      margin: 14px 0 6px;
-      text-align: center;
-      font-size: clamp(30px, 4vw, 48px);
-      line-height: 1.1;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
+  .card{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:16px;
+    box-shadow:0 8px 26px rgba(15,23,42,.06)
+  }
 
-    .subtitle {
-      text-align: center;
-      color: var(--muted);
-      margin-bottom: 24px;
-      font-size: 18px;
-    }
+  .grid{
+    display:grid;
+    grid-template-columns:1.2fr 1fr;
+    gap:16px
+  }
 
-    .panel {
-      background: rgba(255, 255, 255, 0.68);
-      border: 1px solid rgba(216, 222, 232, 0.9);
-      box-shadow: var(--shadow);
-      border-radius: 24px;
-      padding: 18px;
-      backdrop-filter: blur(6px);
-    }
+  @media (max-width:900px){
+    .grid{grid-template-columns:1fr}
+  }
 
-    .top-grid {
-      display: grid;
-      grid-template-columns: 330px 1fr;
-      gap: 16px;
-      align-items: start;
-    }
+  .sec{
+    font-size:12px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:4px 0 12px
+  }
 
-    .field-card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-    }
+  .g{
+    display:flex;
+    justify-content:center
+  }
 
-    .label {
-      display: block;
-      font-weight: 800;
-      font-size: 18px;
-      margin-bottom: 12px;
-    }
+  .kpis{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-top:12px
+  }
 
-    .ticks-row {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      flex-wrap: nowrap;
-      margin-bottom: 10px;
-    }
+  .kpi{
+    background:var(--pill);
+    border-radius:12px;
+    padding:12px
+  }
 
-    .tick-block {
-      width: 26px;
-      height: 14px;
-      border-radius: 999px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
-    }
+  .kpi .label{
+    font-size:12px;
+    color:var(--muted);
+    text-transform:uppercase
+  }
 
-    .tick-block:hover {
-      transform: translateY(-1px);
-    }
+  .kpi .val{
+    font-size:26px;
+    font-weight:800;
+    margin-top:6px
+  }
 
-    .tick-block.active {
-      border-color: var(--tick-outline);
-      box-shadow: 0 0 0 3px rgba(47, 111, 236, 0.14);
-    }
+  .controls{
+    background:var(--pill);
+    border-radius:12px;
+    padding:12px
+  }
 
-    .tick-red { background: var(--tick-red); }
-    .tick-yellow { background: var(--tick-yellow); }
-    .tick-green { background: var(--tick-green); }
+  .ctrl-title{
+    font-size:12px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 10px
+  }
 
-    .tick-numbers {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 14px;
-      padding: 0 2px;
-    }
+  .row{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-top:6px
+  }
 
-    .pill {
-      display: inline-block;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: #edf2fb;
-      border: 1px solid #d7e2fa;
-      color: #294d92;
-      font-size: 14px;
-      font-weight: 700;
-      margin: 4px 8px 8px 0;
-    }
+  .therapy-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px 12px;
+    margin-top:8px
+  }
 
-    .therapy-table {
-      display: grid;
-      grid-template-columns: 1.3fr 1fr;
-      gap: 12px 14px;
-      align-items: end;
-    }
+  .field label{
+    display:block;
+    font-size:14px;
+    margin-bottom:6px
+  }
 
-    .therapy-header {
-      grid-column: 1 / -1;
-      font-weight: 800;
-      font-size: 18px;
-      margin-bottom: 2px;
-    }
+  input[type=number]{
+    width:100%;
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-size:16px;
+    box-sizing:border-box
+  }
 
-    .mini-label {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 6px;
-      display: block;
-      font-weight: 700;
-    }
+  .slider{
+    width:100%;
+    margin-top:10px
+  }
 
-    input[type="number"] {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: white;
-      font-size: 22px;
-      color: var(--text);
-      outline: none;
-    }
+  .note{
+    margin-top:12px;
+    background:#FEF3C7;
+    color:#92400E;
+    border:1px solid #FDE68A;
+    padding:10px;
+    border-radius:10px;
+    font-size:14px
+  }
 
-    input[type="number"]:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(47,111,236,0.12);
-    }
+  .alert{
+    margin-top:12px;
+    display:none;
+    background:#FEE2E2;
+    color:#991B1B;
+    border:1px solid #FCA5A5;
+    padding:10px;
+    border-radius:10px;
+    font-size:14px
+  }
 
-    .alert {
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 700;
-      display: none;
-    }
+  .alert.show{
+    display:block
+  }
 
-    .alert.show {
-      display: block;
-    }
+  .meta{
+    margin-top:12px;
+    font-size:14px;
+    color:var(--text);
+    font-weight:600
+  }
 
-    .alert.danger {
-      background: var(--danger-bg);
-      color: var(--danger);
-      border: 1px solid #f4c3c3;
-    }
+  .tick{stroke:#cbd5e1;stroke-width:2}
+  .lbl{fill:#334155;font-size:12px;font-weight:600}
 
-    .results {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 16px;
-    }
-
-    .result-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 18px;
-      text-align: center;
-      min-height: 132px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .result-title {
-      color: #5c6e8f;
-      font-weight: 800;
-      font-size: 18px;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      margin-bottom: 10px;
-    }
-
-    .result-value {
-      font-size: clamp(28px, 4vw, 46px);
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .unit-inline {
-      font-size: 24px;
-      font-weight: 500;
-      color: #60708f;
-      margin-left: 4px;
-    }
-
-    .hours-info {
-      margin-top: 12px;
-      text-align: left;
-      color: var(--text);
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    .footer-note {
-      margin-top: 16px;
-      color: #4f5f7e;
-      font-size: 15px;
-      line-height: 1.5;
-    }
-
-    .copyright {
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 10px;
-      text-align: center;
-    }
-
-    @media (max-width: 900px) {
-      body { padding: 16px; }
-      .top-grid, .results { grid-template-columns: 1fr; }
-      .therapy-table { grid-template-columns: 1fr 1fr; }
-      input[type="number"] { font-size: 20px; }
-    }
-
-    @media (max-width: 560px) {
-      .therapy-table { grid-template-columns: 1fr; }
-      .tick-block { width: 22px; }
-    }
-  </style>
+  .foot{
+    color:#64748b;
+    font-size:12px;
+    margin-top:10px
+  }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Calcolatore Autonomia – Terapia Multipla Ago</h1>
-    <div class="subtitle">stima prudenziale: si considera sempre − 1 tacca</div>
+<div class="wrap">
+  <h1>Calcolatore Autonomia (ago, 10 tacche) – Terapia multipla</h1>
 
-    <div class="panel">
-      <div class="top-grid">
-        <div class="field-card">
-          <label class="label">Tacca osservata [1–10]</label>
+  <div class="card">
+    <div class="grid">
 
-          <div class="ticks-row" id="ticksRow">
-            <div class="tick-block tick-red" data-tick="1" title="1"></div>
-            <div class="tick-block tick-red" data-tick="2" title="2"></div>
-            <div class="tick-block tick-yellow" data-tick="3" title="3"></div>
-            <div class="tick-block tick-yellow" data-tick="4" title="4"></div>
-            <div class="tick-block tick-green" data-tick="5" title="5"></div>
-            <div class="tick-block tick-green" data-tick="6" title="6"></div>
-            <div class="tick-block tick-green" data-tick="7" title="7"></div>
-            <div class="tick-block tick-green" data-tick="8" title="8"></div>
-            <div class="tick-block tick-green" data-tick="9" title="9"></div>
-            <div class="tick-block tick-green" data-tick="10" title="10"></div>
-          </div>
+      <div>
+        <div class="sec">Quadrante (OUT = 0 → FULL = 10)</div>
+        <div class="g">
+          <svg id="gauge" viewBox="0 0 600 340" width="600" height="340">
+            <path id="base" fill="none" stroke="#e2e8f0" stroke-width="28" stroke-linecap="butt"/>
+            <g id="zones"></g>
+            <g id="ticks"></g>
 
-          <div class="tick-numbers">
-            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-            <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
-          </div>
+            <text x="90" y="300" fill="#ef4444" font-size="12" font-weight="700" text-anchor="start">OUT</text>
+            <text x="510" y="300" fill="#16a34a" font-size="12" font-weight="700" text-anchor="end">FULL</text>
 
-          <div class="pill">Tacca osservata: <span id="tickObserved">8</span></div>
-          <div class="pill">Tacca per calcolo: <span id="tickForCalc">7</span></div>
+            <g id="needle">
+              <circle cx="300" cy="300" r="8" fill="#0ea5e9" stroke="#bae6fd" stroke-width="2"/>
+              <line id="needleLine" x1="300" y1="300" x2="300" y2="140" stroke="#0f172a" stroke-width="6" stroke-linecap="round"/>
+            </g>
+          </svg>
         </div>
 
-        <div class="field-card">
-          <div class="therapy-table">
-            <div class="therapy-header">Terapia giornaliera</div>
+        <input id="levelRange" class="slider" type="range" min="0" max="10" step="1" value="0">
 
-            <div>
-              <label class="mini-label" for="flow1">Flusso 1 (L/min)</label>
+        <div class="foot">
+          Scala lineare: 0 → 0 L · 10 → 26.500 L (≈ 2.650 L per tacca). Colori: 0–1 rosso · 1–3 giallo · 3–10 verde.
+        </div>
+      </div>
+
+      <div>
+        <div class="sec">Impostazioni</div>
+
+        <div class="controls">
+          <div class="ctrl-title">Livello contenitore</div>
+
+          <div class="field">
+            <label for="levelNum">Livello (0..10)</label>
+            <input id="levelNum" type="number" min="0" max="10" step="1" value="0">
+          </div>
+
+          <div class="ctrl-title" style="margin-top:14px;">Terapia giornaliera</div>
+
+          <div class="therapy-grid">
+            <div class="field">
+              <label for="flow1">Flusso 1 (L/min)</label>
               <input id="flow1" type="number" min="0" step="0.1" value="2">
             </div>
-            <div>
-              <label class="mini-label" for="hours1">Ore 1</label>
-              <input id="hours1" type="number" min="0" step="0.1" value="10">
+            <div class="field">
+              <label for="h1">Ore 1</label>
+              <input id="h1" type="number" min="0" step="0.1" value="10">
             </div>
 
-            <div>
-              <label class="mini-label" for="flow2">Flusso 2 (L/min)</label>
+            <div class="field">
+              <label for="flow2">Flusso 2 (L/min)</label>
               <input id="flow2" type="number" min="0" step="0.1" value="3">
             </div>
-            <div>
-              <label class="mini-label" for="hours2">Ore 2</label>
-              <input id="hours2" type="number" min="0" step="0.1" value="10">
+            <div class="field">
+              <label for="h2">Ore 2</label>
+              <input id="h2" type="number" min="0" step="0.1" value="10">
             </div>
 
-            <div>
-              <label class="mini-label" for="flow3">Flusso 3 (L/min)</label>
+            <div class="field">
+              <label for="flow3">Flusso 3 (L/min)</label>
               <input id="flow3" type="number" min="0" step="0.1" value="4">
             </div>
-            <div>
-              <label class="mini-label" for="hours3">Ore 3</label>
-              <input id="hours3" type="number" min="0" step="0.1" value="4">
+            <div class="field">
+              <label for="h3">Ore 3</label>
+              <input id="h3" type="number" min="0" step="0.1" value="4">
             </div>
 
-            <div>
-              <label class="mini-label" for="flow4">Flusso 4 (L/min)</label>
+            <div class="field">
+              <label for="flow4">Flusso 4 (L/min)</label>
               <input id="flow4" type="number" min="0" step="0.1" value="0">
             </div>
-            <div>
-              <label class="mini-label" for="hours4">Ore 4</label>
-              <input id="hours4" type="number" min="0" step="0.1" value="0">
+            <div class="field">
+              <label for="h4">Ore 4</label>
+              <input id="h4" type="number" min="0" step="0.1" value="0">
             </div>
           </div>
 
-          <div id="hoursAlert" class="alert danger">
-            Attenzione: la somma delle ore terapia supera 24 ore. Verificare i dati inseriti.
+          <div class="meta">
+            Totale ore terapia: <span id="totalHours">24</span> h
           </div>
 
-          <div class="hours-info">
-            Totale ore terapia inserite: <span id="totalHoursText">24</span> h
+          <div id="hoursAlert" class="alert">
+            ⚠️ La somma delle ore terapia supera 24 ore. Verificare i dati inseriti.
           </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi">
+            <div class="label">Litri residui</div>
+            <div class="val" id="kpi-litri">0 L</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Autonomia (ore)</div>
+            <div class="val" id="kpi-ore">0 h</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Autonomia (giorni)</div>
+            <div class="val" id="kpi-giorni">0 gg</div>
+          </div>
+        </div>
+
+        <div id="warn" class="note" style="display:block">
+          ⚠️ Con livello <b>0 o 1</b> il contenitore è da considerarsi <b>finito</b> (restano circa <b>2.650 – 3.000 L</b>).
         </div>
       </div>
 
-      <div class="results">
-        <div class="result-card">
-          <div class="result-title">Litri residui (stima prudenziale)</div>
-          <div class="result-value">
-            <span id="litersResidual">18.550</span>
-            <span class="unit-inline">L</span>
-          </div>
-        </div>
-
-        <div class="result-card">
-          <div class="result-title">Autonomia (ore)</div>
-          <div class="result-value" id="autonomyHours">112</div>
-        </div>
-
-        <div class="result-card">
-          <div class="result-title">Autonomia (giorni)</div>
-          <div class="result-value" id="autonomyDays">4,7</div>
-        </div>
-
-        <div class="result-card">
-          <div class="result-title">Consumo/giorno (L)</div>
-          <div class="result-value">
-            <span id="dailyConsumption">3.960</span>
-            <span class="unit-inline">L</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer-note">
-        <strong>Ogni tacca ≈ 2.650 L</strong> (capacità 26.500 L totali su scala 10 tacche).<br>
-        <strong>Colori indicativi (osservati):</strong> 1-2 = rosso · 3-4 = giallo · 5-10 = verde.<br>
-        La stima è prudenziale: si considera sempre una tacca in meno rispetto a quella osservata.
-      </div>
-
-      <div class="copyright">© Calcolatore autonomia – uso informativo</div>
     </div>
   </div>
+</div>
 
-  <script>
-    const LITERS_PER_TICK = 2650;
-    const tickBlocks = document.querySelectorAll('.tick-block');
-    const tickObservedEl = document.getElementById('tickObserved');
-    const tickForCalcEl = document.getElementById('tickForCalc');
-    const litersResidualEl = document.getElementById('litersResidual');
-    const autonomyHoursEl = document.getElementById('autonomyHours');
-    const autonomyDaysEl = document.getElementById('autonomyDays');
-    const dailyConsumptionEl = document.getElementById('dailyConsumption');
-    const totalHoursTextEl = document.getElementById('totalHoursText');
-    const hoursAlertEl = document.getElementById('hoursAlert');
+<script>
+const fmtInt = n => new Intl.NumberFormat('it-IT').format(Math.round(n));
+const fmt1   = n => (Math.round(n*10)/10).toLocaleString('it-IT');
 
-    const inputs = [
-      { flow: document.getElementById('flow1'), hours: document.getElementById('hours1') },
-      { flow: document.getElementById('flow2'), hours: document.getElementById('hours2') },
-      { flow: document.getElementById('flow3'), hours: document.getElementById('hours3') },
-      { flow: document.getElementById('flow4'), hours: document.getElementById('hours4') }
-    ];
+(function buildGauge(){
+  const svg   = document.getElementById('gauge');
+  const base  = svg.querySelector('#base');
+  const zones = svg.querySelector('#zones');
+  const ticks = svg.querySelector('#ticks');
+  const cx=300, cy=300, R=250;
+  const SW=28;
+  const toRad = d => d*Math.PI/180;
+  const angleFromLevel = lv => 180*(1 - lv/10);
 
-    let observedTick = 8;
+  function arcPathExact(a0,a1){
+    const x0=cx + R*Math.cos(toRad(a0)), y0=cy - R*Math.sin(toRad(a0));
+    const x1=cx + R*Math.cos(toRad(a1)), y1=cy - R*Math.sin(toRad(a1));
+    const large = (Math.abs(a1-a0)>180) ? 1 : 0;
+    return `M ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1}`;
+  }
 
-    function parseValue(value) {
-      const parsed = parseFloat(String(value).replace(',', '.'));
-      return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
-    }
+  base.setAttribute('d', arcPathExact(180,0));
+  base.setAttribute('stroke-width', SW);
 
-    function formatInteger(value) {
-      return Math.round(value).toLocaleString('it-IT');
-    }
+  function addZoneLevels(l0,l1,color){
+    const a0 = angleFromLevel(l0);
+    const a1 = angleFromLevel(l1);
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d', arcPathExact(a0,a1));
+    p.setAttribute('fill','none');
+    p.setAttribute('stroke', color);
+    p.setAttribute('stroke-width', SW);
+    p.setAttribute('stroke-linecap','butt');
+    zones.appendChild(p);
+  }
 
-    function formatOneDecimal(value) {
-      return value.toLocaleString('it-IT', {
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1
-      });
-    }
+  addZoneLevels(0,1,'#ef4444');
+  addZoneLevels(1,3,'#f59e0b');
+  addZoneLevels(3,10,'#22c55e');
 
-    function setActiveTick() {
-      tickBlocks.forEach(block => {
-        const tick = Number(block.dataset.tick);
-        block.classList.toggle('active', tick === observedTick);
-      });
-    }
+  for(let lv=0; lv<=10; lv++){
+    const a = angleFromLevel(lv);
+    const x1=cx + R*Math.cos(toRad(a)),      y1=cy - R*Math.sin(toRad(a));
+    const x2=cx + (R-24)*Math.cos(toRad(a)), y2=cy - (R-24)*Math.sin(toRad(a));
 
-    function calculate() {
-      const tickForCalc = Math.max(observedTick - 1, 0);
-      const litersResidual = tickForCalc * LITERS_PER_TICK;
+    const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+    ln.setAttribute('x1',x1);
+    ln.setAttribute('y1',y1);
+    ln.setAttribute('x2',x2);
+    ln.setAttribute('y2',y2);
+    ln.setAttribute('class','tick');
+    ticks.appendChild(ln);
 
-      let totalHours = 0;
-      let dailyConsumption = 0;
+    const tx=cx + (R-42)*Math.cos(toRad(a));
+    const ty=cy - (R-42)*Math.sin(toRad(a));
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',tx);
+    t.setAttribute('y',ty);
+    t.setAttribute('text-anchor','middle');
+    t.setAttribute('alignment-baseline','middle');
+    t.setAttribute('class','lbl');
+    t.textContent=String(lv);
+    ticks.appendChild(t);
+  }
 
-      inputs.forEach(row => {
-        const flow = parseValue(row.flow.value);
-        const hours = parseValue(row.hours.value);
+  window._gauge = {cx,cy,R,angleFromLevel};
+})();
 
-        totalHours += hours;
-        dailyConsumption += flow * 60 * hours;
-      });
+const levelRange = document.getElementById('levelRange');
+const levelNum   = document.getElementById('levelNum');
 
-      let autonomyDays = 0;
-      let autonomyHours = 0;
+const flow1El = document.getElementById('flow1');
+const flow2El = document.getElementById('flow2');
+const flow3El = document.getElementById('flow3');
+const flow4El = document.getElementById('flow4');
 
-      if (dailyConsumption > 0) {
-        autonomyDays = litersResidual / dailyConsumption;
-        autonomyHours = autonomyDays * 24;
-      }
+const h1El = document.getElementById('h1');
+const h2El = document.getElementById('h2');
+const h3El = document.getElementById('h3');
+const h4El = document.getElementById('h4');
 
-      tickObservedEl.textContent = observedTick;
-      tickForCalcEl.textContent = tickForCalc;
-      litersResidualEl.textContent = formatInteger(litersResidual);
-      dailyConsumptionEl.textContent = formatInteger(dailyConsumption);
-      autonomyDaysEl.textContent = dailyConsumption > 0 ? formatOneDecimal(autonomyDays) : '0,0';
-      autonomyHoursEl.textContent = dailyConsumption > 0 ? formatInteger(autonomyHours) : '0';
-      totalHoursTextEl.textContent = formatOneDecimal(totalHours).replace(',0', '');
+const litriEl = document.getElementById('kpi-litri');
+const oreEl   = document.getElementById('kpi-ore');
+const giorniEl= document.getElementById('kpi-giorni');
+const totalHoursEl = document.getElementById('totalHours');
 
-      if (totalHours > 24) {
-        hoursAlertEl.classList.add('show');
-      } else {
-        hoursAlertEl.classList.remove('show');
-      }
-    }
+const needleL = document.getElementById('needleLine');
+const warn    = document.getElementById('warn');
+const hoursAlert = document.getElementById('hoursAlert');
 
-    tickBlocks.forEach(block => {
-      block.addEventListener('click', () => {
-        observedTick = Number(block.dataset.tick);
-        setActiveTick();
-        calculate();
-      });
-    });
+function num(v){
+  const x = Number(String(v).replace(',','.'));
+  return Number.isFinite(x) ? x : 0;
+}
 
-    inputs.forEach(row => {
-      row.flow.addEventListener('input', calculate);
-      row.hours.addEventListener('input', calculate);
-    });
+function recompute(source){
+  let lvl = source==='range' ? Number(levelRange.value) : Number(levelNum.value);
+  if (!isFinite(lvl)) lvl = 0;
+  lvl = Math.max(0, Math.min(10, Math.round(lvl)));
+  levelRange.value = lvl;
+  levelNum.value = lvl;
 
-    setActiveTick();
-    calculate();
-  </script>
+  const liters = 2650 * lvl;
+
+  const f1 = Math.max(0, num(flow1El.value));
+  const f2 = Math.max(0, num(flow2El.value));
+  const f3 = Math.max(0, num(flow3El.value));
+  const f4 = Math.max(0, num(flow4El.value));
+
+  const h1 = Math.max(0, num(h1El.value));
+  const h2 = Math.max(0, num(h2El.value));
+  const h3 = Math.max(0, num(h3El.value));
+  const h4 = Math.max(0, num(h4El.value));
+
+  const totalHours = h1 + h2 + h3 + h4;
+
+  const dailyConsumption =
+    (f1 * 60 * h1) +
+    (f2 * 60 * h2) +
+    (f3 * 60 * h3) +
+    (f4 * 60 * h4);
+
+  const hours = dailyConsumption > 0 ? (liters / dailyConsumption) * totalHours : 0;
+  const days = hours / 24;
+
+  litriEl.textContent = fmtInt(liters) + ' L';
+  oreEl.textContent = fmt1(hours) + ' h';
+  giorniEl.textContent = fmt1(days) + ' gg';
+  totalHoursEl.textContent = fmt1(totalHours).replace(',0','');
+
+  const {cx,cy,R,angleFromLevel} = window._gauge;
+  const a = angleFromLevel(lvl);
+  const x = cx + (R-110)*Math.cos(a*Math.PI/180);
+  const y = cy - (R-110)*Math.sin(a*Math.PI/180);
+  needleL.setAttribute('x2', x);
+  needleL.setAttribute('y2', y);
+
+  warn.style.display = (lvl<=1) ? 'block' : 'none';
+  hoursAlert.classList.toggle('show', totalHours > 24);
+}
+
+levelRange.addEventListener('input', ()=>recompute('range'));
+levelNum.addEventListener('input', ()=>recompute('num'));
+
+[
+  flow1El, flow2El, flow3El, flow4El,
+  h1El, h2El, h3El, h4El
+].forEach(el => el.addEventListener('input', recompute));
+
+recompute('range');
+</script>
 </body>
 </html>
