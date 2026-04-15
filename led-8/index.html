@@ -86,43 +86,47 @@
       margin-bottom: 12px;
     }
 
-    .led-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: nowrap;
-      margin-bottom: 10px;
-    }
+    .led-row,
+.led-numbers {
+  display: grid;
+  grid-template-columns: repeat(8, 34px);
+  gap: 8px;
+  justify-content: start;
+}
 
-    .led-block {
-      width: 34px;
-      height: 14px;
-      border-radius: 999px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
-    }
+.led-row {
+  margin-bottom: 10px;
+  align-items: center;
+}
 
-    .led-block:hover {
-      transform: translateY(-1px);
-    }
+.led-block {
+  width: 34px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
 
-    .led-block.active {
-      border-color: var(--led-outline);
-      box-shadow: 0 0 0 3px rgba(47, 111, 236, 0.14);
-    }
+.led-block:hover {
+  transform: translateY(-1px);
+}
 
-    .led-red { background: var(--led-red); }
-    .led-yellow { background: var(--led-yellow); }
-    .led-green { background: var(--led-green); }
+.led-block.active {
+  border-color: var(--led-outline);
+  box-shadow: 0 0 0 3px rgba(47, 111, 236, 0.14);
+}
 
-    .led-numbers {
-      display: flex;
-      gap: 17px;
-      font-size: 13px;
-      color: var(--muted);
-      margin-left: 12px;
-      margin-bottom: 14px;
+.led-red { background: var(--led-red); }
+.led-yellow { background: var(--led-yellow); }
+.led-green { background: var(--led-green); }
+
+.led-numbers {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 14px;
+  text-align: center;
+}
     }
 
     .pill {
